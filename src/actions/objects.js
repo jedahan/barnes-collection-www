@@ -58,6 +58,32 @@ export const findFilteredObjects = (filters) => {
   }
 }
 
+const multiMatch = (body, term) => {
+  const fields = [
+    'people^3',
+    'culture^3',
+    'title^3',
+    'medium^3',
+    'invno',
+    'shortDescription^2',
+    'longDescription^2',
+    'visualDescription^2',
+    'exhHistory',
+    'bibliography',
+    'provenance',
+    'copyright',
+    'period',
+    // 'displayDate',
+    // 'dimexnsions',
+    // 'locations',
+  ];
+  body = body.query('multi_match', {
+    'query': term,
+    'fields': fields
+  });
+  return body;
+}
+
 export const searchObjects = (term) => {
   return (dispatch) => {
     if (term.length === 0) {
@@ -65,7 +91,8 @@ export const searchObjects = (term) => {
     }
 
     let body = buildRequestBody();
-    body = body.query('match', '_all', term);
+    body = multiMatch(body, term);
+    // body = body.query('match', '_all', term);
     body = body.build();
 
     fetchResults(body, dispatch);
